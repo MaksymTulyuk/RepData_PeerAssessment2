@@ -159,7 +159,7 @@ damage1
 
 The most harmful event for humans is `r casualties1[1,1]` with the total casualties `r casualties1[1,4]` (fatalities `r casualties1[1,2]` and injuries `r casualties1[1,3]`)
 
-```{r, echo = FALSE}
+```{r}
 ggplot(casualties1, aes(x = reorder(EventType, Casualties), y = Casualties/1000, fill = EventType)) + coord_flip() + geom_bar(stat="identity") + xlab("Event Type") + ylab("Casualties (thousands)") + ggtitle("Impact on population")
 ```
 
@@ -171,6 +171,6 @@ billion <- 1000000000
 The most harmful event on economy is `r damage1[1,1]` with the total damage `r damage1[1,4]/billion` billions US dollars (the property damage `r damage1[1,2]/billion` billions US dollars and the crop damage `r damage1[1,3]/billion` billions US dollars)
 
 
-```{r, echo = FALSE}
+```{r}
 ggplot(damage1, aes(x = reorder(EventType, Damage), y = Damage/billion, fill = EventType)) + coord_flip() + geom_bar(stat="identity") + xlab("Event Type") + ylab("Total Damage (Billions USD)") + ggtitle("Impact on economy")
 ```
