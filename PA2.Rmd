@@ -11,5 +11,83 @@ This data analysis answers two questions: across the United States:
 
 To answer on this question I analyse U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database that tracks characteristics of major storms and weather events in the United States between 1950 and November 2011
 
+## Data Analysis
+
+1. Prerequisits
+
+```{r}
+# R.utils requires to unzip the data file
+library("R.utils")
+```
+
+1. Load NOAA database into R
+```{r, cache=TRUE}
+# download and unpack data from the Internet
+if(!file.exists("repdata-data-StormData.csv.bz2") and !file.exists("repdata-data-StormData.csv"))
+  download.file("http://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2", destfile = "repdata-data-StormData.csv.bz2")
+if(!file.exists("repdata-data-StormData.csv"))
+  bunzip2("repdata-data-StormData.csv.bz2")
+
+# load data into R
+data = read.csv("repdata-data-StormData.csv")
+```
+
+2. Show information over the dataset
+```{r, cache=TRUE}
+# data dimentions
+rows <- dim(data)[1]
+columns <- dim(data)[2]
+
+# show all columns
+colnames(data)
+```
+
+3. Remove unused data
+
+A big dataset with `r rows` rows and `r columns` columns is rather big so I keep the columns I need:
+```{r, cache=TRUE}
+tinyData <- data[,c("EVTYPE", "FATALITIES", "INJURIES", "PROPDMG", "PROPDMGEXP", "CROPDMG", "CROPDMGEXP")]
+colnames(tinyData) <- c("EventType", "Fatalities", "Injuries", "PropertyDamage", "PropertyDamageMultiplicator", "CropDamage", "CropDamageMultiplicator")
+colnames(tinyData)
+```
+
+4. Change the data type from strings to numbers
+
+The columns `PropertyDamageMultiplicator` and `CropDamageMultiplicator` have the symbols 'H', 'K', 'M' and 'B' instead of numbers 100, 1000, 1000000, 1000000000
+```{r}
+summary(tinyData)
+```
+
+and I replace the symbols with the numbers, multiply and remove the column "...Multiplicator"
+- for Property Damage
+```{r, cache=TRUE}
+levels(tinyData$PropertyDamageMultiplicator)
+levels(tinyData$PropertyDamageMultiplicator)[1:4] <- c("0", "1", "1", "1")
+levels(tinyData$PropertyDamageMultiplicator)[10:15] <- c("1000000000", "100", "100", "1000", "1000000", "1000000")
+levels(tinyData$PropertyDamageMultiplicator)
+tinyData$PropertyDamageMultiplicator <- as.integer(as.character(tinyData$PropertyDamageMultiplicator))
+tinyData$PropertyDamage <- tinyData$PropertyDamage * tinyData$PropertyDamageMultiplicator
+tinyData$PropertyDamageMultiplicator <- NULL
+```
+
+- for Crop Damage
+```{r, cache=TRUE}
+levels(tinyData$CropDamageMultiplicator)
+levels(tinyData$CropDamageMultiplicator)[1:2] <- c("0", "1")
+levels(tinyData$CropDamageMultiplicator)[3:7] <- c("1000000000", "1000", "1000", "1000000", "1000000")
+levels(tinyData$CropDamageMultiplicator)
+tinyData$CropDamageMultiplicator <- as.integer(as.character(tinyData$CropDamageMultiplicator))
+tinyData$CropDamage <- tinyData$CropDamage * tinyData$CropDamageMultiplicator
+tinyData$CropDamageMultiplicator <- NULL
+```
+
+5. Look for the most harmful event on population health
+
+6 .Look for the most harmful event with the greatest economic consequences
+
+6. Draw graphs
+
+## Results
+
 The analysis shows that ... has the most severe impact on population health and ... causes the greatest economic consequences
 
