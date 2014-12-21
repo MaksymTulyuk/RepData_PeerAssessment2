@@ -16,7 +16,9 @@ To answer on this question I analyse U.S. National Oceanic and Atmospheric Admin
 
 ### Prerequisits
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
+library("knitr")
+options(scipen = 6, digits = 3)
 # R.utils requires to unzip the data file
 library("R.utils")
 # ggplot requires to draw graphs
@@ -65,8 +67,10 @@ summary(tinyData$CropDamageMultiplicator)
 
 and I replace the symbols with the numbers, multiply and remove the column "...Multiplicator"
 - for Property Damage
-```{r, cache=TRUE}
+```{r, cache=TRUE, results='hide'}
+levels(tinyData$PropertyDamageMultiplicator)
 levels(tinyData$PropertyDamageMultiplicator)[1:4] <- c("0", "1", "1", "1")
+levels(tinyData$PropertyDamageMultiplicator)
 levels(tinyData$PropertyDamageMultiplicator)[10:15] <- c("1000000000", "100", "100", "1000", "1000000", "1000000")
 levels(tinyData$PropertyDamageMultiplicator)
 tinyData$PropertyDamageMultiplicator <- as.integer(as.character(tinyData$PropertyDamageMultiplicator))
@@ -75,8 +79,10 @@ tinyData$PropertyDamageMultiplicator <- NULL
 ```
 
 - for Crop Damage
-```{r, cache=TRUE}
+```{r, cache=TRUE, results='hide'}
+levels(tinyData$CropDamageMultiplicator)
 levels(tinyData$CropDamageMultiplicator)[1:2] <- c("0", "1")
+levels(tinyData$CropDamageMultiplicator)
 levels(tinyData$CropDamageMultiplicator)[4:8] <- c("1000000000", "1000", "1000", "1000000", "1000000")
 levels(tinyData$CropDamageMultiplicator)
 tinyData$CropDamageMultiplicator <- as.integer(as.character(tinyData$CropDamageMultiplicator))
@@ -107,6 +113,15 @@ casualties$Casualties <- casualties$Fatalities + casualties$Injuries
 casualties <- casualties[order(-casualties$Casualties),]
 ```
 
+- get 1% of most harmful events and divide on billion
+```{r, cache=TRUE}
+one <- quantile(casualties$Casualties, c(0, 1, 0.99))[3]
+casualties1 <- casualties[casualties$Casualties > one,]
+casualties1[,c(2:4)] <- casualties1[,c(2:4)] / 1000000000
+row.names(casualties1) <- NULL
+casualties1
+```
+
 ### Look for the most harmful event with the greatest economic consequences
 
 - get sorted summary of property damage
@@ -130,13 +145,30 @@ damage$Damage <- damage$PropertyDamage + damage$CropDamage
 damage <- damage[order(-damage$Damage),]
 ```
 
+- get 1% of most damageable events
+```{r, cache=TRUE}
+one <- quantile(damage$Damage, c(0, 1, 0.99))[3]
+damage1 <- damage[damage$Damage > one,]
+damage1[,c(2:4)] <- damage1[,c(2:4)] / 1000000000
+row.names(damage1) <- NULL
+damage1
+```
+
 ## Results
 
 ### Impact on polulation
 
-The most harmful event for humans is `r casualties[1,1]` with the total casualties `r casualties[1,4]` (fatalities `r casualties[1,2]` and injuries `r casualties[1,3]`)
+The most harmful event for humans is `r casualties1[1,1]` with the total casualties `r casualties1[1,4]` (fatalities `r casualties1[1,2]` and injuries `r casualties1[1,3]`)
+
+```{r, echo = FALSE}
+ggplot(casualties1, aes(x = reorder(EventType, Casualties), y = Fatalities + Injuries)) + coord_flip() + geom_bar(stat="identity") + xlab("Event Types") + ylab("Casualties") + ggtitle("Impact on population")
+```
 
 ### Impact on economy
 
-The most harmful event on economy is `r damage[1,1]` with the total damage `r damage[1,4]` (the property damage `r damage[1,2]` and the crop damage `r damage[1,3]`)
+The most harmful event on economy is `r damage1[1,1]` with the total damage `r damage1[1,4]` billions US dollars (the property damage `r damage1[1,2]` billions US dollars and the crop damage `r damage1[1,3]` billions US dollars)
 
+
+```{r, echo = FALSE}
+ggplot(damage1, aes(x = reorder(EventType, Damage), y = PropertyDamage + CropDamage)) + coord_flip() + geom_bar(stat="identity") + xlab("Event Types") + ylab("Total Damage (Billions USD)") + ggtitle("Impact on economy")
+```
