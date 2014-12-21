@@ -1,11 +1,12 @@
 ---
-title: "The most harmful events on population and economy of the USA"
+title: "The most harmful events on population and economy of the United States"
 output: html_document
 ---
 
 ## Synopsis
 
 This data analysis answers two questions: across the United States:
+
 1. Which types of events are most harmful with respect to population health?
 2. Which types of events have the greatest economic consequences?
 
@@ -85,32 +86,57 @@ tinyData$CropDamageMultiplicator <- NULL
 
 ### Look for the most harmful event on population health
 
-- get sorted summary of all fatalities
+- get sorted summary of fatalities
 ```{r, cache=TRUE}
 fatalities <- with(tinyData, aggregate(Fatalities, by = list(EventType), sum))
 colnames(fatalities) <- c("EventType", "Fatalities")
 fatalities <- fatalities[order(-fatalities$Fatalities),]
 ```
 
-- get sorted summary of all injuries
+- get sorted summary of injuries
 ```{r, cache=TRUE}
 injuries <- with(tinyData, aggregate(Injuries, by = list(EventType), sum))
 colnames(injuries) <- c("EventType", "Injuries")
 injuries <- injuries[order(-injuries$Injuries),]
 ```
 
-- get summary of all fatalities and injuries
+- get sorted summary of fatalities and injuries
 ```{r, cache=TRUE}
 casualties <- merge(fatalities, injuries, by.y = "EventType")
 casualties$Casualties <- casualties$Fatalities + casualties$Injuries
 casualties <- casualties[order(-casualties$Casualties),]
 ```
 
-Therefore, the most harmful event for humans is `r casualties[1,1]` with the total casualties `r casualties[1,4]` (fatalities `r casualties[1,2]` and injuries `r casualties[1,3]`)
-
 ### Look for the most harmful event with the greatest economic consequences
+
+- get sorted summary of property damage
+```{r, cache=TRUE}
+propertyDamage <- with(tinyData, aggregate(PropertyDamage, by = list(EventType), sum))
+colnames(propertyDamage) <- c("EventType", "PropertyDamage")
+propertyDamage <- propertyDamage[order(-propertyDamage$PropertyDamage),]
+```
+
+- get sorted summary of crop damage
+```{r, cache=TRUE}
+cropDamage <- with(tinyData, aggregate(CropDamage, by = list(EventType), sum))
+colnames(cropDamage) <- c("EventType", "CropDamage")
+cropDamage <- cropDamage[order(-cropDamage$CropDamage),]
+```
+
+- get sorted summary of damage to property and crop
+```{r, cache=TRUE}
+damage <- merge(propertyDamage, cropDamage, by.y = "EventType")
+damage$Damage <- damage$PropertyDamage + damage$CropDamage
+damage <- damage[order(-damage$Damage),]
+```
 
 ## Results
 
-The analysis shows that ... has the most severe impact on population health and ... causes the greatest economic consequences
+### Impact on polulation
+
+The most harmful event for humans is `r casualties[1,1]` with the total casualties `r casualties[1,4]` (fatalities `r casualties[1,2]` and injuries `r casualties[1,3]`)
+
+### Impact on economy
+
+The most harmful event on economy is `r damage[1,1]` with the total damage `r damage[1,4]` (the property damage `r damage[1,2]` and the crop damage `r damage[1,3]`)
 

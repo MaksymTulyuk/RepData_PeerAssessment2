@@ -57,7 +57,11 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 
 <div id="synopsis" class="section level2">
 <h2>Synopsis</h2>
-<p>This data analysis answers two questions: across the United States: 1. Which types of events are most harmful with respect to population health? 2. Which types of events have the greatest economic consequences?</p>
+<p>This data analysis answers two questions: across the United States:</p>
+<ol style="list-style-type: decimal">
+<li>Which types of events are most harmful with respect to population health?</li>
+<li>Which types of events have the greatest economic consequences?</li>
+</ol>
 <p>To answer on this question I analyse U.S. National Oceanic and Atmospheric Administration’s (NOAA) storm database that tracks characteristics of major storms and weather events in the United States between 1950 and November 2011</p>
 </div>
 <div id="data-analysis" class="section level2">
@@ -143,32 +147,56 @@ tinyData$CropDamageMultiplicator &lt;- NULL</code></pre>
 <div id="look-for-the-most-harmful-event-on-population-health" class="section level3">
 <h3>Look for the most harmful event on population health</h3>
 <ul>
-<li>get sorted summary of all fatalities</li>
+<li>get sorted summary of fatalities</li>
 </ul>
 <pre class="r"><code>fatalities &lt;- with(tinyData, aggregate(Fatalities, by = list(EventType), sum))
 colnames(fatalities) &lt;- c(&quot;EventType&quot;, &quot;Fatalities&quot;)
 fatalities &lt;- fatalities[order(-fatalities$Fatalities),]</code></pre>
 <ul>
-<li>get sorted summary of all injuries</li>
+<li>get sorted summary of injuries</li>
 </ul>
 <pre class="r"><code>injuries &lt;- with(tinyData, aggregate(Injuries, by = list(EventType), sum))
 colnames(injuries) &lt;- c(&quot;EventType&quot;, &quot;Injuries&quot;)
 injuries &lt;- injuries[order(-injuries$Injuries),]</code></pre>
 <ul>
-<li>get summary of all fatalities and injuries</li>
+<li>get sorted summary of fatalities and injuries</li>
 </ul>
 <pre class="r"><code>casualties &lt;- merge(fatalities, injuries, by.y = &quot;EventType&quot;)
 casualties$Casualties &lt;- casualties$Fatalities + casualties$Injuries
 casualties &lt;- casualties[order(-casualties$Casualties),]</code></pre>
-<p>Therefore, the most harmful event for humans is TORNADO with the total casualties 9.697910^{4} (fatalities 5633 and injuries 9.134610^{4})</p>
 </div>
 <div id="look-for-the-most-harmful-event-with-the-greatest-economic-consequences" class="section level3">
 <h3>Look for the most harmful event with the greatest economic consequences</h3>
+<ul>
+<li>get sorted summary of property damage</li>
+</ul>
+<pre class="r"><code>propertyDamage &lt;- with(tinyData, aggregate(PropertyDamage, by = list(EventType), sum))
+colnames(propertyDamage) &lt;- c(&quot;EventType&quot;, &quot;PropertyDamage&quot;)
+propertyDamage &lt;- propertyDamage[order(-propertyDamage$PropertyDamage),]</code></pre>
+<ul>
+<li>get sorted summary of crop damage</li>
+</ul>
+<pre class="r"><code>cropDamage &lt;- with(tinyData, aggregate(CropDamage, by = list(EventType), sum))
+colnames(cropDamage) &lt;- c(&quot;EventType&quot;, &quot;CropDamage&quot;)
+cropDamage &lt;- cropDamage[order(-cropDamage$CropDamage),]</code></pre>
+<ul>
+<li>get sorted summary of damage to property and crop</li>
+</ul>
+<pre class="r"><code>damage &lt;- merge(propertyDamage, cropDamage, by.y = &quot;EventType&quot;)
+damage$Damage &lt;- damage$PropertyDamage + damage$CropDamage
+damage &lt;- damage[order(-damage$Damage),]</code></pre>
 </div>
 </div>
 <div id="results" class="section level2">
 <h2>Results</h2>
-<p>The analysis shows that … has the most severe impact on population health and … causes the greatest economic consequences</p>
+<div id="impact-on-polulation" class="section level3">
+<h3>Impact on polulation</h3>
+<p>The most harmful event for humans is TORNADO with the total casualties 9.697910^{4} (fatalities 5633 and injuries 9.134610^{4})</p>
+</div>
+<div id="impact-on-economy" class="section level3">
+<h3>Impact on economy</h3>
+<p>The most harmful event on economy is FLOOD with the total damage 1.503196810^{11} (the property damage 1.446577110^{11} and the crop damage 5.661968410^{9})</p>
+</div>
 </div>
 
 
