@@ -1,0 +1,15 @@
+---
+title: "The most harmful events on population and economy of the USA"
+output: html_document
+---
+
+## Synopsis
+
+This data analysis answers two questions: across the United States:
+1. Which types of events are most harmful with respect to population health?
+2. Which types of events have the greatest economic consequences?
+
+To answer on this question I analyse U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database that tracks characteristics of major storms and weather events in the United States between 1950 and November 2011
+
+The analysis shows that ... has the most severe impact on population health and ... causes the greatest economic consequences
+
